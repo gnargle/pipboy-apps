@@ -19,7 +19,7 @@ bC.drawImage( //full byte pp
         127,127,127,127,127,127,127,127,
         127,127,127,127,127,127,127,127,
     ]).buffer},50,50);
-bC.drawImage( //dithered square
+bC.drawImage( //dithered square - this is how dimming is actually achieved on this thing.
     {width: 16, height: 16, bpp:1, buffer: new Uint8Array([
         0b10101010,0b10101010,
         0b01010101,0b01010101,
