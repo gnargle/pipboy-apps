@@ -1,7 +1,14 @@
 const perkListMax = 10;
 
-function buildList(directory, selected){
-  bC.clear();  
+function draw(selected){
+  bC.clear(); 
+  buildList("USER/PERKS", selected);
+  bH.flip();
+  bF.flip();
+  bC.flip();  
+}
+
+function buildList(directory, selected){   
   let files = require("fs").readdirSync(directory)
   log("filelist: " + files);
   let max = files.length >= files ? perkListMax : files.length;
@@ -15,10 +22,7 @@ function buildList(directory, selected){
       drawSelectedPerkOutline(i);
     }
     drawPerkTitle(fileObj.title, i);
-  }
-  bH.flip();
-  bF.flip();
-  bC.flip();  
+  }  
 }
 
 function drawPerk(fileObj){  
@@ -47,7 +51,7 @@ function drawSelectedPerkOutline(i){
   bC.drawRect(5,(20 * i),190,(20 * i) + 23)
 }
 
-buildList("USER/PERKS", 0);
+draw(0);
 setTimeout(() => {
-  buildList("USER/PERKS", 1);
+  draw(1);
 }, 10000)
