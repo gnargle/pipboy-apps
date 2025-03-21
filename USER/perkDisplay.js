@@ -44,7 +44,10 @@ function drawPerkDesc(desc){
 }
 
 function drawSelectedPerkOutline(i){
-  bC.drawRect(5,0,190,23)
+  bC.drawRect(5,(20 * i),190,(20 * i) + 23)
 }
 
 buildList("USER/PERKS", 0);
+setTimeout(() => {
+  buildList("USER/PERKS", 1);
+}, 10000)
