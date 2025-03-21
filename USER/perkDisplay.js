@@ -1,4 +1,7 @@
 const perkListMax = 10;
+const fontSizeTitle = 16;
+const fontSizeDesc = 14;
+const titleOffsetY = 20;
 
 function draw(selected){
   bC.clear(); 
@@ -38,17 +41,17 @@ function drawPerkImage(imgStr, xSize, ySize){
 }
 
 function drawPerkTitle(title, i){
-  bC.setFontVector(16);
-  bC.drawString(title, 10, (20 * i) + 5);
+  bC.setFontVector(fontSizeTitle);
+  bC.drawString(title, 10, (titleOffsetY * i) + 5);
 }
 
 function drawPerkDesc(desc){
-  bC.setFontVector(14);
+  bC.setFontVector(fontSizeDesc);
   bC.drawString(desc, 10, 150);
 }
 
 function drawSelectedPerkOutline(i){
-  bC.drawRect(5,(20 * i),190,(20 * i) + 23)
+  bC.drawRect(5,(titleOffsetY * i),190,(titleOffsetY * i) + 23)
 }
 
 draw(0)
