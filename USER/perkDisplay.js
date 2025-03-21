@@ -51,7 +51,10 @@ function drawSelectedPerkOutline(i){
   bC.drawRect(5,(20 * i),190,(20 * i) + 23)
 }
 
-draw(0);
+draw(0)
 setTimeout(() => {
   draw(1);
+  setTimeout(() => {
+    showMainMenu();
+  }, 10000)
 }, 10000)
