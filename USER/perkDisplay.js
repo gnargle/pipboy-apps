@@ -1,4 +1,4 @@
-const perkListMax = 10;
+const perkListDisplayMax = 10;
 const fontSizeTitle = 16;
 const fontSizeDesc = 14;
 const titleOffsetY = 22;
@@ -8,8 +8,9 @@ const colourBlack = 0;
 const colourGray1 = 1;
 const colourGray2 = 2;
 const colourWhite = 3;
-let totalFileListLength = 0;
-
+const knob1Down = -1;
+const knob1Up = 1;
+const knob1Press = 0;
 
 Graphics.prototype.setFontMonofonto14 = function() {
   // Actual height 14 (13 - 0)
@@ -33,8 +34,9 @@ function draw(selected){
 function buildList(directory, selected){   
   let files = require("fs").readdirSync(directory)
   totalFileListLength = files.length;
-  let max = Math.min(perkListMax, totalFileListLength);
-  for(i = 0; i < max; i++){
+  loadedListMax = totalFileListLength; //change later when we have multiple page loading down.
+  perkListMax = Math.min(perkListDisplayMax, totalFileListLength);
+  for(i = 0; i < perkListMax; i++){
     let file = files[i];
     let fileString = require("fs").readFileSync( directory + "/" + file);
     let fileObj = JSON.parse(fileString);
@@ -88,10 +90,32 @@ function drawSelectedPerkOutline(i){
   bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
 }
 
-draw(0)
-setTimeout(() => {
-  draw(1);
-  setTimeout(() => {
-    showMainMenu();
-  }, 10000)
-}, 10000)
+function handleKnob1(dir){
+  //first, play the click.
+  Pip.knob1Click(dir);
+  if (dir == 0){
+    //clicked in, bail to top level.
+    gracefulClose();
+  }
+  //then, we need to change our position in the list.
+  currSelected -= dir; //-1 is scroll down, but our list increases numerically. so we need to subtract
+  if (currSelected < 0){
+    currSelected = perkListMax - 1;
+  } else if (currSelected >= perkListMax){
+    currSelected = 0;
+  }
+  draw(currSelected);
+}
+
+function gracefulClose(){
+  Pip.removeListener("knob1",handleKnob1); 
+  showMainMenu();
+}
+
+let totalFileListLength = 0;
+let loadedListMax = 0;
+let perkListMax = 0;
+let currSelected = 0;
+
+Pip.on("knob1",handleKnob1);
+draw(currSelected)
