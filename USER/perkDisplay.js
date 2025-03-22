@@ -41,7 +41,6 @@ function buildList(directory, selected){
     //We're beyond the number of perks we can see on one page.
     //We need to get the next set of files and display them
     perkListMax = Math.min(perkListDisplayMax * (a + 1), loadedListMax);
-    log("new perkListMax:" + perkListMax);    
   }
   for(i = a * perkListDisplayMax; i < perkListMax; i++){
     let file = files[i];
@@ -100,10 +99,6 @@ function drawSelectedPerkOutline(i){
 function handleKnob1(dir){
   //first, play the click.
   Pip.knob1Click(dir);
-  if (dir == 0){
-    //clicked in, bail to top level.
-    gracefulClose();
-  }
   //then, we need to change our position in the list.
   currSelected -= dir; //-1 is scroll down, but our list increases numerically. so we need to subtract
   if (currSelected < 0){
@@ -114,13 +109,31 @@ function handleKnob1(dir){
   draw(currSelected);
 }
 
+function handleTorch(){
+  gracefulClose();
+  torchButtonHandler();
+}
+
 function gracefulClose(){
   Pip.removeListener("knob1",handleKnob1); 
-  showMainMenu();
+  Pip.removeListener("torch",handleTorch); 
+  clearInterval(intervalId);
+  clearInterval(modeCheck);
+  showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
 }
 
 let loadedListMax = 0;
 let currSelected = 0;
 
+
 Pip.on("knob1",handleKnob1);
+Pip.on("torch",handleTorch)
 draw(currSelected)
+let modeCheck = setInterval(checkMode,50);
+let intervalId = setInterval(() => {  
+  if (Pip.mode == 2){
+    draw(currSelected); 
+  } else {
+    gracefulClose();
+  }
+}, 1000);
