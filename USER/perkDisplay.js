@@ -1,6 +1,4 @@
-const perkListDisplayMax = 6;
-const fontSizeTitle = 16;
-const fontSizeDesc = 14;
+const entryListDisplayMax = 6;
 const titleOffsetY = 22;
 const perkImageXMaxSize = 167;
 const perkImageYMaxSize = 153;
@@ -8,9 +6,9 @@ const colourBlack = 0;
 const colourGray1 = 1;
 const colourGray2 = 2;
 const colourWhite = 3;
-const knob1Down = -1;
-const knob1Up = 1;
-const knob1Press = 0;
+const maxScreen = 1; 
+const perkScreen = 0;
+const statScreen = 1;
 
 Graphics.prototype.setFontMonofonto14 = function() {
   // Actual height 14 (13 - 0)
@@ -23,43 +21,50 @@ Graphics.prototype.setFontMonofonto14 = function() {
   );
 }
 
-function draw(selected){
+function draw(){
   bC.clear(); 
-  buildList("USER/PERKS/ENABLED", selected);
+  if (screenSelected == perkScreen){
+    buildScreen("USER/PERKS/ENABLED");
+  } else if (screenSelected == statScreen){
+    buildScreen("USER/SKILLS");
+  }
   bH.flip();
   bF.flip();
   bC.flip();  
 }
 
-function buildList(directory, selected){   
-  let files = require("fs").readdirSync(directory)
-  loadedListMax = files.length;
-  let perkListMax = Math.min(perkListDisplayMax, loadedListMax);
-  let a = 0;
-  while (selected >= perkListMax){
-    a++;
-    //We're beyond the number of perks we can see on one page.
-    //We need to get the next set of files and display them
-    perkListMax = Math.min(perkListDisplayMax * (a + 1), loadedListMax);
-  }
-  for(i = a * perkListDisplayMax; i < perkListMax; i++){
-    let file = files[i];
-    let fileString = require("fs").readFileSync( directory + "/" + file);
-    let fileObj = JSON.parse(fileString);
-    if (i == selected){
-      drawPerk(fileObj);
-      drawSelectedPerkOutline(i%perkListDisplayMax);
-    }  
-    drawPerkTitle(fileObj.title, i%perkListDisplayMax, i==selected);     
-  }  
+function buildScreen(directory){
+    let files = require("fs").readdirSync(directory)
+    loadedListMax = files.length;
+    let entryListMax = Math.min(entryListDisplayMax, loadedListMax);
+    let a = 0;
+    while (entrySelected >= entryListMax){
+      a++;
+      //We're beyond the number of entries we can see on one page.
+      //We need to get the next set of files and display them
+      entryListMax = Math.min(entryListDisplayMax * (a + 1), loadedListMax);
+    }
+    for(i = a * entryListDisplayMax; i < entryListMax; i++){
+      let file = files[i];
+      let fileString = require("fs").readFileSync( directory + "/" + file);
+      let fileObj = JSON.parse(fileString);
+      if (i == entrySelected){
+        drawEntry(fileObj);
+        drawSelectedEntryOutline(i%entryListDisplayMax);
+      }
+      drawEntryTitle(fileObj.title, i%entryListDisplayMax, i==entrySelected);
+      if (screenSelected == statScreen){
+        drawEntryPoints(fileObj.points, i%entryListDisplayMax, i==entrySelected); 
+      }
+    }
 }
 
-function drawPerk(fileObj){  
-    drawPerkImage(fileObj.img, fileObj.xSize, fileObj.ySize);
-    drawPerkDesc(fileObj.description);
+function drawEntry(perkObj){  
+    drawEntryImage(perkObj.img, perkObj.xSize, perkObj.ySize);
+    drawEntryDesc(perkObj.description);
 }
 
-function drawPerkImage(imgStr, xSize, ySize){
+function drawEntryImage(imgStr, xSize, ySize){
   //so we want to try and draw as central as possible.
   //our 'window' for how big the perk can be is 167x153 (y truncated for the desc at the bottom)
   //to figure out how to centre the image we need to get the difference
@@ -74,7 +79,7 @@ function drawPerkImage(imgStr, xSize, ySize){
   }, 200 + xOffset,0 + yOffset);  
 }
 
-function drawPerkTitle(title, i, selected){
+function drawEntryTitle(title, i, selected){
   bC.setFontMonofonto18(); 
   if (selected){
     bC.setColor(colourBlack);      
@@ -85,13 +90,24 @@ function drawPerkTitle(title, i, selected){
   bC.drawString(title, 10, (titleOffsetY * i) + 5);  
 }
 
-function drawPerkDesc(desc){
+function drawEntryPoints(points, i, selected){
+  bC.setFontMonofonto18(); 
+  if (selected){
+    bC.setColor(colourBlack);      
+  }
+  else {
+    bC.setColor(colourWhite);
+  }
+  bC.drawString(points, 160, (titleOffsetY * i) + 5);  
+}
+
+function drawEntryDesc(desc){
   bC.setFontMonofonto14();
   bC.setColor(colourWhite);
   bC.drawString(desc, 10, 150);
 }
 
-function drawSelectedPerkOutline(i){
+function drawSelectedEntryOutline(i){
   bC.setColor(colourWhite);
   bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
 }
@@ -100,13 +116,27 @@ function handleKnob1(dir){
   //first, play the click.
   Pip.knob1Click(dir);
   //then, we need to change our position in the list.
-  currSelected -= dir; //-1 is scroll down, but our list increases numerically. so we need to subtract
-  if (currSelected < 0){
-    currSelected = loadedListMax - 1;
-  } else if (currSelected >= loadedListMax){
-    currSelected = 0;
+  entrySelected -= dir; //-1 is scroll down, but our list increases numerically. so we need to subtract
+  if (entrySelected < 0){
+    entrySelected = loadedListMax - 1;
+  } else if (entrySelected >= loadedListMax){
+    entrySelected = 0;
   }
-  draw(currSelected);
+  draw(entrySelected);
+}
+
+function handleKnob2(dir){
+  //first, play the click.
+  Pip.knob2Click(dir);
+  log("knob2 direction: " + dir);
+  //then switch stats screen.
+  screenSelected += dir;
+  entrySelected = 0; //reset to top of list
+  if (screenSelected > maxScreen){
+    screenSelected = 0;
+  } else if (screenSelected < 0){
+    screenSelected = maxScreen;
+  }
 }
 
 function handleTorch(){
@@ -116,6 +146,7 @@ function handleTorch(){
 
 function gracefulClose(){
   Pip.removeListener("knob1",handleKnob1); 
+  Pip.removeListener("knob2",handleKnob2); 
   Pip.removeListener("torch",handleTorch); 
   clearInterval(intervalId);
   clearInterval(modeCheck);
@@ -123,16 +154,17 @@ function gracefulClose(){
 }
 
 let loadedListMax = 0;
-let currSelected = 0;
-
+let entrySelected = 0;
+let screenSelected = 0;
 
 Pip.on("knob1",handleKnob1);
+Pip.on("knob2",handleKnob2);
 Pip.on("torch",handleTorch)
-draw(currSelected)
+draw()
 let modeCheck = setInterval(checkMode,100);
 let intervalId = setInterval(() => {  
   if (Pip.mode == 2){
-    draw(currSelected); 
+    draw(); 
   } else {
     gracefulClose();
   }
