@@ -1,9 +1,26 @@
 const perkListMax = 10;
 const fontSizeTitle = 16;
 const fontSizeDesc = 14;
-const titleOffsetY = 20;
+const titleOffsetY = 22;
 const perkImageXMaxSize = 167;
 const perkImageYMaxSize = 153;
+const colourBlack = 0;
+const colourGray1 = 1;
+const colourGray2 = 2;
+const colourWhite = 3;
+let totalFileListLength = 0;
+
+
+Graphics.prototype.setFontMonofonto14 = function() {
+  // Actual height 14 (13 - 0)
+  // 1 BPP
+  return this.setFontCustom(
+    E.toString(require('heatshrink').decompress(atob('AB0D/uP/0/7AICh+AnwNC8AGBAoMBwFnw4UB/H/8f/h4ZDgHxw/nn/e+/55/DEIV88P/w/4g/4v/j7+MvwNBu4iBx/2FIPz8EfwEyKAwjB/BZGgH/5///kPLQcD///n/whgIBAQMzgARB+E/wE/gHMMwUAgkAiEBJgPgAwQyFgPgg+AjAIDsCCBg0ABINgCwoKBnAKDgahBFYN+h/gnkA4BTCUAkBXgX4n4OCgEcgCSBRYP+HQUjweOn0zDYNj+ODG4INB4YNBt0zzDKCwZYCIIN+XQLYEMwkD/cP90/zHO8c/ZQZxBj+DJgOY/1jz+IBoXAkcHxhhDgfgWwUAmODLQU7zHusZhEnED/GP805/Hn8f+g/wWwuYg9wjOABQkZ8F3wOYWIakB+EHsAUB4cDH4UJgEkgGQgVAAwgNBmHAWwIwB8EPEQTUCsEDwOO9033H8kfggY+Cj5xB+f95v7m3s/+x/zVBgPgN4U/+H/AwOAjyuDBof4UAKEEv/DAwUwjHg8eDwUIBoLRCBoM4nDmD/ANGmOY41jSggNFwHGgbyCh5KBBoOOg0z/Hv8e/DYLfCBoOAsAGFFIXALQYNBAwMBBoQtBsEBxkODYZtCIowNB/fjgZTIEQhFGOwJFIDYfwh4NFN4yZEG5E54H/gKlCDYsHnE+//7cIIbHnY3C+YpDvHD+eP80z7Hn8efBoMwTIL7FAwIZCn43DwEGPoJTEng3BwYGBDYQGB4AbBnxFDwf+Po0ghHxAwOH/iZDwZFD/BFBDYINB/jCDmEY4fjn5TCzH4dogADh//AAJXCiEAnApBgH8AIV+QoLhBIoIfBg4ZCLoQMBh+AN4PwgPgGIkEFIVAgIGFBoMCgEMG4QtBDIcwhvgm6SBgfYcIM/ehEDjANF8EH4AGB8wNBh3gmINBgPwCgfGUAauCDYvWgdYCgM9BoLqBhj0F5j0DDYMPY4Ow43D/4GC8BTIWQJhFhljn+O/0zWgJ+BAAMDgcMh8//3/+f/aIY+C/4iC90CjAlDgBoGgf4G4Y+BAwgmDBohMGoCgF3ANBj53DN4Xw//DXgquGSwIUDG43AG4MOeAIpDh1AWoJTCfYMXSQiiBwf+h/4hlgcwUDXgIpCg0AIosDwEPMIU+PoXAnCuCKYUfRYs8BoMChEMEQV+BocgFInENAMfegQpDKYVgm4pEKYYADhB4Bn////+PwqOC/+/BYIVDCYP//h/BkAKBOQUAsEBPIYGBBoI'))),
+    32,
+    atob("BwYHCAgICAYHBggIBgcGCAgGCAgICAgICAgGBggICAgICAgICAcICAgICAgICAgICAgICAgICAgICAgICAUICAcICAgICAgICAcHCAYICAgICAgICAgICAgICAgGBwg="),
+    14|65536
+  );
+}
 
 function draw(selected){
   bC.clear(); 
@@ -15,7 +32,8 @@ function draw(selected){
 
 function buildList(directory, selected){   
   let files = require("fs").readdirSync(directory)
-  let max = files.length >= files ? perkListMax : files.length;
+  totalFileListLength = files.length;
+  let max = Math.min(perkListMax, totalFileListLength);
   for(i = 0; i < max; i++){
     let file = files[i];
     let fileString = require("fs").readFileSync( directory + "/" + file);
@@ -24,7 +42,7 @@ function buildList(directory, selected){
       drawPerk(fileObj);
       drawSelectedPerkOutline(i);
     }  
-    drawPerkTitle(fileObj.title, i);
+    drawPerkTitle(fileObj.title, i, i==selected);     
   }  
 }
 
@@ -41,24 +59,33 @@ function drawPerkImage(imgStr, xSize, ySize){
   //to the location.
   let xOffset = Math.floor((perkImageXMaxSize - xSize)/2);
   let yOffset = Math.floor((perkImageYMaxSize - ySize)/2);
+  bC.setColor(colourGray2);
   bC.drawImage({
     width : xSize, height : ySize, bpp : 1,
     buffer : require("heatshrink").decompress(atob(imgStr))
   }, 200 + xOffset,0 + yOffset);  
 }
 
-function drawPerkTitle(title, i){
-  bC.setFontVector(fontSizeTitle);
-  bC.drawString(title, 10, (titleOffsetY * i) + 5);
+function drawPerkTitle(title, i, selected){
+  bC.setFontMonofonto18(); 
+  if (selected){
+    bC.setColor(colourBlack);      
+  }
+  else {
+    bC.setColor(colourWhite);
+  }
+  bC.drawString(title, 10, (titleOffsetY * i) + 5);  
 }
 
 function drawPerkDesc(desc){
-  bC.setFontVector(fontSizeDesc);
+  bC.setFontMonofonto14();
+  bC.setColor(colourWhite);
   bC.drawString(desc, 10, 150);
 }
 
 function drawSelectedPerkOutline(i){
-  bC.drawRect(5,(titleOffsetY * i),190,(titleOffsetY * i) + 23)
+  bC.setColor(colourWhite);
+  bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
 }
 
 draw(0)
