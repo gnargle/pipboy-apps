@@ -1,4 +1,4 @@
-const perkListDisplayMax = 10;
+const perkListDisplayMax = 6;
 const fontSizeTitle = 16;
 const fontSizeDesc = 14;
 const titleOffsetY = 22;
@@ -25,7 +25,7 @@ Graphics.prototype.setFontMonofonto14 = function() {
 
 function draw(selected){
   bC.clear(); 
-  buildList("USER/PERKS", selected);
+  buildList("USER/PERKS/ENABLED", selected);
   bH.flip();
   bF.flip();
   bC.flip();  
@@ -33,18 +33,25 @@ function draw(selected){
 
 function buildList(directory, selected){   
   let files = require("fs").readdirSync(directory)
-  totalFileListLength = files.length;
-  loadedListMax = totalFileListLength; //change later when we have multiple page loading down.
-  perkListMax = Math.min(perkListDisplayMax, totalFileListLength);
-  for(i = 0; i < perkListMax; i++){
+  loadedListMax = files.length;
+  let perkListMax = Math.min(perkListDisplayMax, loadedListMax);
+  let a = 0;
+  while (selected >= perkListMax){
+    a++;
+    //We're beyond the number of perks we can see on one page.
+    //We need to get the next set of files and display them
+    perkListMax = Math.min(perkListDisplayMax * (a + 1), loadedListMax);
+    log("new perkListMax:" + perkListMax);    
+  }
+  for(i = a * perkListDisplayMax; i < perkListMax; i++){
     let file = files[i];
     let fileString = require("fs").readFileSync( directory + "/" + file);
     let fileObj = JSON.parse(fileString);
     if (i == selected){
       drawPerk(fileObj);
-      drawSelectedPerkOutline(i);
+      drawSelectedPerkOutline(i%perkListDisplayMax);
     }  
-    drawPerkTitle(fileObj.title, i, i==selected);     
+    drawPerkTitle(fileObj.title, i%perkListDisplayMax, i==selected);     
   }  
 }
 
@@ -100,8 +107,8 @@ function handleKnob1(dir){
   //then, we need to change our position in the list.
   currSelected -= dir; //-1 is scroll down, but our list increases numerically. so we need to subtract
   if (currSelected < 0){
-    currSelected = perkListMax - 1;
-  } else if (currSelected >= perkListMax){
+    currSelected = loadedListMax - 1;
+  } else if (currSelected >= loadedListMax){
     currSelected = 0;
   }
   draw(currSelected);
@@ -112,9 +119,7 @@ function gracefulClose(){
   showMainMenu();
 }
 
-let totalFileListLength = 0;
 let loadedListMax = 0;
-let perkListMax = 0;
 let currSelected = 0;
 
 Pip.on("knob1",handleKnob1);
