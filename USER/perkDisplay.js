@@ -129,7 +129,7 @@ let currSelected = 0;
 Pip.on("knob1",handleKnob1);
 Pip.on("torch",handleTorch)
 draw(currSelected)
-let modeCheck = setInterval(checkMode,50);
+let modeCheck = setInterval(checkMode,100);
 let intervalId = setInterval(() => {  
   if (Pip.mode == 2){
     draw(currSelected); 
