@@ -152,12 +152,20 @@ function handleTorch(){
 }
 
 function gracefulClose(){
+  //shut down interval triggers first in case one fires while we're tearing down
+  clearInterval(modeCheck);
+  clearInterval(intervalId);
   Pip.removeListener("knob1",handleKnob1); 
   Pip.removeListener("knob2",handleKnob2); 
   Pip.removeListener("torch",handleTorch); 
-  clearInterval(intervalId);
-  clearInterval(modeCheck);
   showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
+}
+
+function ourModeHandler(){
+  checkMode();
+  if (Pip.mode != 2){
+    gracefulClose();
+  }
 }
 
 let loadedListMax = 0;
@@ -167,9 +175,9 @@ let drawing=false;
 
 Pip.on("knob1",handleKnob1);
 Pip.on("knob2",handleKnob2);
-Pip.on("torch",handleTorch)
-draw()
-let modeCheck = setInterval(checkMode,100);
+Pip.on("torch",handleTorch);
+draw();
+let modeCheck = setInterval(ourModeHandler,100);
 let intervalId = setInterval(() => {  
   if (Pip.mode == 2){
     draw(); 
