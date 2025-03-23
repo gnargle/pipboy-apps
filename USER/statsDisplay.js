@@ -6,9 +6,10 @@ const colourBlack = 0;
 const colourGray1 = 1;
 const colourGray2 = 2;
 const colourWhite = 3;
-const maxScreen = 1; 
-const perkScreen = 0;
+const maxScreen = 2; 
+const perkScreen = 2;
 const statScreen = 1;
+const SPECIALScreen=0;
 
 Graphics.prototype.setFontMonofonto14 = function() {
   // Actual height 14 (13 - 0)
@@ -22,15 +23,20 @@ Graphics.prototype.setFontMonofonto14 = function() {
 }
 
 function draw(){
+  if (drawing) return;
+  drawing = true;
   bC.clear(); 
   if (screenSelected == perkScreen){
     buildScreen("USER/PERKS/ENABLED");
   } else if (screenSelected == statScreen){
     buildScreen("USER/SKILLS");
+  } else if (screenSelected == SPECIALScreen){
+    buildScreen("USER/SPECIAL");
   }
   bH.flip();
   bF.flip();
   bC.flip();  
+  drawing = false;
 }
 
 function buildScreen(directory){
@@ -53,7 +59,7 @@ function buildScreen(directory){
         drawSelectedEntryOutline(i%entryListDisplayMax);
       }
       drawEntryTitle(fileObj.title, i%entryListDisplayMax, i==entrySelected);
-      if (screenSelected == statScreen){
+      if (screenSelected != perkScreen){
         drawEntryPoints(fileObj.points, i%entryListDisplayMax, i==entrySelected); 
       }
     }
@@ -122,7 +128,7 @@ function handleKnob1(dir){
   } else if (entrySelected >= loadedListMax){
     entrySelected = 0;
   }
-  draw(entrySelected);
+  draw();
 }
 
 function handleKnob2(dir){
@@ -137,6 +143,7 @@ function handleKnob2(dir){
   } else if (screenSelected < 0){
     screenSelected = maxScreen;
   }
+  draw();
 }
 
 function handleTorch(){
@@ -156,6 +163,7 @@ function gracefulClose(){
 let loadedListMax = 0;
 let entrySelected = 0;
 let screenSelected = 0;
+let drawing=false;
 
 Pip.on("knob1",handleKnob1);
 Pip.on("knob2",handleKnob2);
