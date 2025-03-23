@@ -1,7 +1,10 @@
 # BACKUP YOUR PIP-BOY SD CARD BEFORE USING THIS.
+
 Repo containing my custom applications for the PipBoy 3000 MkVI prop from The Wand Company.
-To use, download the repository and move the USER and APPINFO folders into your PipBoy SD Card. 
+To use, download the repository and move the USER and APPINFO folders into your PipBoy SD Card.
 For more information on how to access the SD card, see my [blog on the subject](https://athene.gay/projects/pipboy.html) and [RobCo's blogposts](https://log.robco-industries.org/documentation/pipboy-3000/#main-menu). This project would not have been possible without RobCo paving the way and documenting a lot of the Pip-Boy's firmware.
+
+No perks are enabled by default - to enable the ones you like, just drag them from the DISABLED folder to the ENABLED folder.
 
 You can customise the points in a skill for yourself by changing the 'points' value in the relevant skill's JSON.
 
