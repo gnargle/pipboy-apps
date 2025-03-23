@@ -113,6 +113,9 @@ function generatePerksConfigLists(){
   let allDir = "USER/PERKS/ALL";
   //first load of screen, build the full list.
   let files = require("fs").readdirSync(enabledDir);
+  if (files == undefined){
+    require("fs").mkdir(enabledDir);
+  }
   for (file of files){
     enabledPerks.push(file);
   }
