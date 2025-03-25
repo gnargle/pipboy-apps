@@ -1,5 +1,7 @@
 //SECTION: consts
 const entryListDisplayMax = 6;
+const configListDisplayMax = 16;
+const configColumnDisplayMax = 8; //half of config display max
 const titleOffsetY = 22;
 const perkImageXMaxSize = 167;
 const perkImageYMaxSize = 153;
@@ -47,6 +49,10 @@ function draw(){
 function buildScreen(directory){
     let files = require("fs").readdirSync(directory);
     loadedListMax = files.length;
+    if (files.length == 0){
+      drawEmptyScreen();
+      return;
+    }
     let entryListMax = Math.min(entryListDisplayMax, loadedListMax);
     let a = 0;
     while (entrySelected >= entryListMax){
@@ -75,10 +81,60 @@ function buildScreen(directory){
 }
 
 function buildPerkSelectionScreen(){
+  if (allPerks.length == 0){
+    generatePerksConfigLists();
+  }
+  //ok, now for each element in allPerks, we draw it.
+  //I think we can draw two columns of 8 titles, so sixteen on screen
+  //at a time. Then scroll further and it's a new screen of sixteen.
+  let entryListMax = Math.min(configListDisplayMax, loadedListMax);
+  let a = 0;
+  while (entrySelected >= entryListMax){
+    a++;
+    //We're beyond the number of entries we can see on one page.
+    //We need to get the next set of files and display them
+    entryListMax = Math.min(configListDisplayMax * (a + 1), loadedListMax);
+  }
+  let col = 0; a = 0;
+  for(i = a * configListDisplayMax; i < entryListMax; i++){
+    if (a == 7){
+      col = 1;
+    }
+    let perk = allPerks[i];
+    if (i == entrySelected){
+      drawSelectedEntryOutlineConfig(i%configListDisplayMax, col);
+    }    
+    drawEntryTitleConfig(perk.title, i%configListDisplayMax, i==entrySelected, col, enabledPerks.includes(perk.filename));
+    a++;
+  }
+}
 
+function generatePerksConfigLists(){
+  let enabledDir = "USER/PERKS/ENABLED";
+  let allDir = "USER/PERKS/ALL";
+  //first load of screen, build the full list.
+  let files = require("fs").readdirSync(enabledDir);
+  for (file of files){
+    enabledPerks.push(file);
+  }
+  files = require("fs").readdirSync(allDir);
+  loadedListMax = files.length;
+  for (file of files){
+    let fileString = require("fs").readFileSync(allDir + "/" + file);
+    let fileObj = JSON.parse(fileString);
+    let perkObj = {filename: file, title: fileObj.title};
+    allPerks.push(perkObj);
+  }
 }
 
 //SECTION: Element Drawing
+
+function drawEmptyScreen(){
+  bC.setFontMonofonto18();
+  bC.setColor(colourWhite);
+  bC.drawString("No Perks selected, press wheel to configure.", 2, 100);
+}
+
 function drawEntry(perkObj){  
     drawEntryImage(perkObj.img, perkObj.xSize, perkObj.ySize);
     drawEntryDesc(perkObj.description);
@@ -110,6 +166,27 @@ function drawEntryTitle(title, i, selected){
   bC.drawString(title, 10, (titleOffsetY * i) + 5);  
 }
 
+function drawEntryTitleConfig(title, i, selected, col, enabled){
+  bC.setFontMonofonto18(); 
+  let finalTitle = "";
+  if (enabled){
+    finalTitle = title + " *";
+  } else {
+    finalTitle = title;
+  }
+  if (selected){
+    bC.setColor(colourBlack);      
+  }
+  else {
+    bC.setColor(colourWhite);
+  }
+  if (col == 0){
+    bC.drawString(finalTitle, 10, (titleOffsetY * i) + 5);  
+  } else {
+    bC.drawString(finalTitle, 210, (titleOffsetY * (i-configColumnDisplayMax + 1)) + 5);  
+  }
+}
+
 function drawEntryPoints(points, i, selected){
   bC.setFontMonofonto18(); 
   if (selected){
@@ -138,6 +215,15 @@ function drawSelectedEntryOutline(i){
   bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
 }
 
+function drawSelectedEntryOutlineConfig(i, col){  
+  bC.setColor(colourWhite);
+  if (col == 0){
+    bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
+  } else {
+    bC.fillRect(205,(titleOffsetY * (i-configColumnDisplayMax + 1)) + 1,390,(titleOffsetY * (i-configColumnDisplayMax + 1)) + 23)
+  }
+}
+
 //SECTION: config saving
 function saveFile(directory){
   let files = require("fs").readdirSync(directory);  
@@ -157,8 +243,39 @@ function saveNewValue(){
   }
 }
 
-function saveNewPerkSelection(){
+function saveEnabledPerk(filename){
+  //"USER/PERKS/ALL"
+  let fileString = require("fs").readFileSync( "USER/PERKS/ALL/" + filename);
+  require("fs").writeFile("USER/PERKS/ENABLED/" + filename, fileString);
+}
 
+function saveNewPerkSelection(){
+  let enabledFiles = require("fs").readdirSync("USER/PERKS/ENABLED/");
+  for (let i = 0; i < allPerks.length; i++){
+    let perk = allPerks[i];
+    if (enabledPerks.includes(perk.filename) && enabledFiles.includes(perk.filename)){
+      continue; //was enabled, still enabled, nothing to do.
+    } else if (enabledPerks.includes(perk.filename) && !enabledFiles.includes(perk.filename)){
+      //wasn't enabled, is enabled now, copy the file to enabled folder.
+      saveEnabledPerk(perk.filename)
+    } else if (!enabledPerks.includes(perk.filename) && enabledFiles.includes(perk.filename)){
+      //was enabled, no longer is, delete the file from ENABLED
+      require("fs").unlink("USER/PERKS/ENABLED/" + perk.filename);
+    }
+  }
+  //everything done, wipe out the in-memory enabled/disabled lists.
+  enabledPerks = [];
+  allPerks = [];
+}
+
+function togglePerkEnabled(){
+  let perkObj = allPerks[entrySelected];
+  if (enabledPerks.includes(perkObj.filename)){
+    let index = enabledPerks.indexOf(perkObj.filename)
+    enabledPerks.splice(index, 1);
+  } else {
+    enabledPerks.push(perkObj.filename);
+  }
 }
 
 function gracefulClose(){
@@ -204,6 +321,8 @@ function handleKnob1(dir){
     if (screenSelected == perkScreen){
       //change screen to perk selection screen.
       screenSelected = perkSelectionScreen;
+    } else if (screenSelected == perkSelectionScreen){
+      togglePerkEnabled();
     } else {
       //toggle configuration mode on special/skills screens
       configMode = !configMode;
@@ -270,6 +389,8 @@ let screenSelected = 0;
 let pointsOfSelected = 0;
 let drawing=false;
 let configMode = false;
+let allPerks = [];
+let enabledPerks = [];
 
 Pip.on("knob1",handleKnob1);
 let registeredKnob1Func = handleKnob1;
