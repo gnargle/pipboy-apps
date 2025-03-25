@@ -1,3 +1,4 @@
+//SECTION: consts
 const entryListDisplayMax = 6;
 const titleOffsetY = 22;
 const perkImageXMaxSize = 167;
@@ -23,6 +24,7 @@ Graphics.prototype.setFontMonofonto14 = function() {
   );
 }
 
+//SECTION: Screen drawing
 function draw(){
   if (drawing) return;
   drawing = true;
@@ -76,6 +78,7 @@ function buildPerkSelectionScreen(){
 
 }
 
+//SECTION: Element Drawing
 function drawEntry(perkObj){  
     drawEntryImage(perkObj.img, perkObj.xSize, perkObj.ySize);
     drawEntryDesc(perkObj.description);
@@ -135,6 +138,7 @@ function drawSelectedEntryOutline(i){
   bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
 }
 
+//SECTION: config saving
 function saveFile(directory){
   let files = require("fs").readdirSync(directory);  
   let fileToSave = directory + "/" + files[entrySelected];
@@ -146,10 +150,6 @@ function saveFile(directory){
 }
 
 function saveNewValue(){
-  //so to save we need: 
-  // * the screen we're on and the folder we're using
-  // * the selected entry
-  // * the selected entries new points
   if (screenSelected == SPECIALScreen){
     saveFile("USER/SPECIAL");
   } else if (screenSelected == statScreen){
@@ -157,6 +157,21 @@ function saveNewValue(){
   }
 }
 
+function saveNewPerkSelection(){
+
+}
+
+function gracefulClose(){
+  //shut down interval triggers first in case one fires while we're tearing down
+  clearInterval(modeCheck);
+  clearInterval(intervalId);
+  Pip.removeListener("knob1",registeredKnob1Func);
+  Pip.removeListener("knob2",handleKnob2); 
+  Pip.removeListener("torch",handleTorch); 
+  showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
+}
+
+//SECTION: Button handlers
 function handleKnob1Config(dir){
   //first, play the click.
   Pip.knob1Click(dir);
@@ -215,7 +230,13 @@ function handleKnob2(dir){
   //if switching screens we need to boot immediately out of config without saving.
   configMode = false; 
   //then switch stats screen.
-  screenSelected += dir;
+  if (screenSelected == perkSelectionScreen){
+    //if scrolling away from perk selection screen, save changes and reset to perk screen.
+    saveNewPerkSelection();
+    screenSelected = perkScreen;
+  } else {
+    screenSelected += dir;
+  }
   entrySelected = 0; //reset to top of list
   if (screenSelected > maxScreen){
     screenSelected = 0;
@@ -230,16 +251,6 @@ function handleTorch(){
   torchButtonHandler();
 }
 
-function gracefulClose(){
-  //shut down interval triggers first in case one fires while we're tearing down
-  clearInterval(modeCheck);
-  clearInterval(intervalId);
-  Pip.removeListener("knob1",registeredKnob1Func);
-  Pip.removeListener("knob2",handleKnob2); 
-  Pip.removeListener("torch",handleTorch); 
-  showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
-}
-
 function ourModeHandler(){
   checkMode();
   if (Pip.mode != 2){
@@ -249,9 +260,9 @@ function ourModeHandler(){
 
 function powerHandler(){
   gracefulClose();
-  //may need to also trigger the default power handler here also depending on if this overwrites the other one,
-  //that is Pip.powerButtonHandler();
 }
+
+//SECTION: main entry point
 
 let loadedListMax = 0;
 let entrySelected = 0;
