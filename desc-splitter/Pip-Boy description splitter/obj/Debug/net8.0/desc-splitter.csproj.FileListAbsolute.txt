@@ -1,0 +1,15 @@
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\bin\Debug\net8.0\desc-splitter.exe
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\bin\Debug\net8.0\desc-splitter.deps.json
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\bin\Debug\net8.0\desc-splitter.runtimeconfig.json
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\bin\Debug\net8.0\desc-splitter.dll
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\bin\Debug\net8.0\desc-splitter.pdb
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.AssemblyInfoInputs.cache
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.AssemblyInfo.cs
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.csproj.CoreCompileInputs.cache
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.sourcelink.json
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.dll
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\refint\desc-splitter.dll
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.pdb
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\desc-splitter.genruntimeconfig.cache
+C:\Users\gnarg\source\repos\gnargle\pipboy-apps\desc-splitter\Pip-Boy description splitter\obj\Debug\net8.0\ref\desc-splitter.dll

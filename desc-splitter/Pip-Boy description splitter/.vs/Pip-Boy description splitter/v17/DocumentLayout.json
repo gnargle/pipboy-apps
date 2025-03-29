@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\Pip-Boy description splitter\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{611D3D41-0F63-444F-8201-DEAA43152358}|Pip-Boy description splitter.csproj|c:\\users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\pip-boy description splitter\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{611D3D41-0F63-444F-8201-DEAA43152358}|Pip-Boy description splitter.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\Pip-Boy description splitter\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\Pip-Boy description splitter\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACQAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-29T16:07:05.113Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

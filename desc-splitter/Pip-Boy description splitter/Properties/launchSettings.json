@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pip-Boy description splitter": {
+      "commandName": "Project",
+      "commandLineArgs": "\"In combat, you do +10% damage against female opponents. Outside of combat, you'll sometimes have access to unique dialogue options when dealing with the opposite sex.\""
+    }
+  }
+}

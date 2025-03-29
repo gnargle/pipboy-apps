@@ -1,7 +1,7 @@
 //SECTION: consts
 const entryListDisplayMax = 6;
-const configListDisplayMax = 16;
-const configColumnDisplayMax = 8; //half of config display max
+const configListDisplayMax = 18;
+const configColumnDisplayMax = 9; //half of config display max
 const titleOffsetY = 22;
 const perkImageXMaxSize = 167;
 const perkImageYMaxSize = 153;
@@ -95,9 +95,9 @@ function buildPerkSelectionScreen(){
     //We need to get the next set of files and display them
     entryListMax = Math.min(configListDisplayMax * (a + 1), loadedListMax);
   }
-  let col = 0; a = 0;
-  for(i = a * configListDisplayMax; i < entryListMax; i++){
-    if (a == 7){
+  let col = 0;
+  for(i = a * configListDisplayMax; i < entryListMax; i++){    
+    if (i != a * configListDisplayMax && i % configColumnDisplayMax == 0){
       col = 1;
     }
     let perk = allPerks[i];
@@ -105,7 +105,6 @@ function buildPerkSelectionScreen(){
       drawSelectedEntryOutlineConfig(i%configListDisplayMax, col);
     }    
     drawEntryTitleConfig(perk.title, i%configListDisplayMax, i==entrySelected, col, enabledPerks.includes(perk.filename));
-    a++;
   }
 }
 
@@ -183,7 +182,7 @@ function drawEntryTitleConfig(title, i, selected, col, enabled){
   if (col == 0){
     bC.drawString(finalTitle, 10, (titleOffsetY * i) + 5);  
   } else {
-    bC.drawString(finalTitle, 210, (titleOffsetY * (i-configColumnDisplayMax + 1)) + 5);  
+    bC.drawString(finalTitle, 210, (titleOffsetY * (i-configColumnDisplayMax)) + 5);  
   }
 }
 
@@ -220,7 +219,7 @@ function drawSelectedEntryOutlineConfig(i, col){
   if (col == 0){
     bC.fillRect(5,(titleOffsetY * i) + 1,190,(titleOffsetY * i) + 23)
   } else {
-    bC.fillRect(205,(titleOffsetY * (i-configColumnDisplayMax + 1)) + 1,390,(titleOffsetY * (i-configColumnDisplayMax + 1)) + 23)
+    bC.fillRect(205,(titleOffsetY * (i-configColumnDisplayMax)) + 1,390,(titleOffsetY * (i-configColumnDisplayMax)) + 23)
   }
 }
 
@@ -320,6 +319,7 @@ function handleKnob1(dir){
     //pressed in, this is the config trigger.
     if (screenSelected == perkScreen){
       //change screen to perk selection screen.
+      entrySelected = 0;
       screenSelected = perkSelectionScreen;
     } else if (screenSelected == perkSelectionScreen){
       togglePerkEnabled();
