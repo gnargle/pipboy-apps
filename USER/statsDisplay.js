@@ -51,8 +51,6 @@ function draw(){
 }
 
 function buildScreen(directory){
-    
-    log("directory: " + directory);
     var files;
     try{
     files = require("fs").readdirSync(directory);
