@@ -14,10 +14,10 @@ const perkScreen = 2;
 const statScreen = 1;
 const SPECIALScreen=0;
 const perkSelectionScreen = 3;
-const enabledPerkFolder = "USER/PERKS/ENABLED/";
-const allPerkFolder = "USER/PERKS/ALL/";
-const skillsFolder = "USER/SKILLS/";
-const specialFolder = "USER/SPECIAL/"
+const enabledPerkFolder = 'USER/StatsDisplay/PERKS/ENABLED/';
+const allPerkFolder = 'USER/StatsDisplay/PERKS/ALL/';
+const skillsFolder = 'USER/StatsDisplay/SKILLS/';
+const specialFolder = 'USER/StatsDisplay/SPECIAL/';
 
 Graphics.prototype.setFontMonofonto14 = function() {
   // Actual height 14 (13 - 0)
@@ -51,7 +51,15 @@ function draw(){
 }
 
 function buildScreen(directory){
-    let files = require("fs").readdirSync(directory);
+    
+    log("directory: " + directory);
+    var files;
+    try{
+    files = require("fs").readdirSync(directory);
+    } catch{
+      require("fs").mkdir(directory);
+      files = require("fs").readdirSync(directory);
+    }
     loadedListMax = files.length;
     if (files.length == 0){
       drawEmptyScreen();
@@ -114,9 +122,12 @@ function buildPerkSelectionScreen(){
 
 function generatePerksConfigLists(){
   //first load of screen, build the full list.
-  let files = require("fs").readdirSync(enabledPerkFolder);
-  if (files == undefined){
-    require("fs").mkdir(enabledPerkFolder);
+  var files;
+  try{
+  files = require("fs").readdirSync(enabledPerkFolder);
+  } catch{
+    require("fs").mkdir(enabledPerkFolder); 
+    files = require("fs").readdirSync(enabledPerkFolder);
   }
   for (file of files){
     enabledPerks.push(file);
