@@ -291,16 +291,6 @@ function togglePerkEnabled(){
   }
 }
 
-function gracefulClose(){
-  //shut down interval triggers first in case one fires while we're tearing down
-  clearInterval(modeCheck);
-  clearInterval(intervalId);
-  Pip.removeListener("knob1",registeredKnob1Func);
-  Pip.removeListener("knob2",handleKnob2); 
-  Pip.removeListener("torch",handleTorch); 
-  showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
-}
-
 //SECTION: Button handlers
 function handleKnob1Config(dir){
   //first, play the click.
@@ -395,6 +385,26 @@ function powerHandler(){
   gracefulClose();
 }
 
+function gracefulClose(){
+  //shut down interval triggers first in case one fires while we're tearing down
+  clearInterval(modeCheck);
+  clearInterval(intervalId);
+  Pip.removeListener("knob1",registeredKnob1Func);
+  Pip.removeListener("knob2",handleKnob2); 
+  Pip.removeListener("torch",handleTorch); 
+  //now clear used memory.
+  /*delete loadedListMax;
+  delete entrySelected;
+  delete screenSelected;
+  delete pointsOfSelected;
+  delete drawing;
+  delete configMode;
+  delete allPerks;
+  delete enabledPerks;
+  delete registeredKnob1Func;*/
+  showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
+}
+
 //SECTION: main entry point
 
 let loadedListMax = 0;
@@ -405,12 +415,12 @@ let drawing=false;
 let configMode = false;
 let allPerks = [];
 let enabledPerks = [];
-
-Pip.on("knob1",handleKnob1);
 let registeredKnob1Func = handleKnob1;
+
+Pip.on("knob1",registeredKnob1Func);
 Pip.on("knob2",handleKnob2);
 Pip.on("torch",handleTorch);
-setWatch(powerHandler,BTN_POWER,{repeat:false})
+setWatch(powerHandler,BTN_POWER,{repeat:false});
 draw();
 let modeCheck = setInterval(ourModeHandler,100);
 let intervalId = setInterval(() => {  
