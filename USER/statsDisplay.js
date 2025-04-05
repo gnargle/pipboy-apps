@@ -51,6 +51,10 @@ function draw(){
 }
 
 function buildScreen(directory){
+  //directory will only be used when we need to go to SD, which will be when perk changes or we scroll to the next page.
+  if (lastReload == null){
+    displayedPerks = [];
+    //time to populate the displayedPerks array and currentPerk
     var files;
     try{
     files = require("fs").readdirSync(directory);
@@ -75,19 +79,45 @@ function buildScreen(directory){
       let file = files[i];
       let fileString = require("fs").readFileSync(directory + file);
       let fileObj = JSON.parse(fileString);
-      if (i == entrySelected){
-        drawEntry(fileObj);
-        drawSelectedEntryOutline(i%entryListDisplayMax);
-        if (!configMode && screenSelected != perkScreen){
-          //only update pointsOfSelected when not actively configuring.
-          pointsOfSelected = fileObj.points;
-        }
-      }
-      drawEntryTitle(fileObj.title, i%entryListDisplayMax, i==entrySelected);
       if (screenSelected != perkScreen){
-        drawEntryPoints(fileObj.points, i%entryListDisplayMax, i==entrySelected); 
+        displayedPerks.push({
+          title: fileObj.title,
+          filename: file,
+          entryNum: i,
+          points: fileObj.points
+        });
+      } else {
+        displayedPerks.push({
+          title: fileObj.title,
+          filename: file,
+          entryNum: i
+        });
       }
     }
+    lastReload = entrySelected;
+  }
+  if (currentPerk == null){
+    let currPerkInt = entrySelected%6;
+    let file = displayedPerks[currPerkInt].filename;
+    let fileString = require("fs").readFileSync(directory + file);
+    let fileObj = JSON.parse(fileString);
+    currentPerk = fileObj;
+  }
+  for(let i = 0; i < displayedPerks.length; i++){
+    let perkObj = displayedPerks[i];    
+    if (perkObj.entryNum == entrySelected){
+      drawEntry(currentPerk);
+      drawSelectedEntryOutline(i);
+      if (!configMode && screenSelected != perkScreen){
+        //only update pointsOfSelected when not actively configuring.
+        pointsOfSelected = perkObj.points;
+      }
+    }
+    drawEntryTitle(perkObj.title, i, perkObj.entryNum == entrySelected);
+    if (screenSelected != perkScreen){
+      drawEntryPoints(perkObj.points, i, perkObj.entryNum == entrySelected); 
+    }
+  }
 }
 
 function buildPerkSelectionScreen(){
@@ -244,8 +274,11 @@ function saveFile(directory){
   let fileString = require("fs").readFileSync(fileToSave);
   let fileObj = JSON.parse(fileString);
   fileObj.points = pointsOfSelected;
-  fileString = JSON.stringify(fileObj);
+  fileString = JSON.stringify(fileObj);  
   require("fs").writeFile(fileToSave, fileString);
+  //update in memory data.
+  displayedPerks[entrySelected%entryListDisplayMax].points = pointsOfSelected;
+  currentPerk = fileObj;
 }
 
 function saveNewValue(){
@@ -325,6 +358,7 @@ function handleKnob1(dir){
       //change screen to perk selection screen.
       entrySelected = 0;
       screenSelected = perkSelectionScreen;
+      currentPerk = null;
     } else if (screenSelected == perkSelectionScreen){
       togglePerkEnabled();
     } else {
@@ -337,10 +371,17 @@ function handleKnob1(dir){
   } else {
     //then, we need to change our position in the list.
     entrySelected -= dir; //-1 is scroll down, but our list increases numerically. so we need to subtract
+    currentPerk = null;
     if (entrySelected < 0){
       entrySelected = loadedListMax - 1;
     } else if (entrySelected >= loadedListMax){
       entrySelected = 0;
+    }
+    if (dir > 0 && lastReload - 1 == entrySelected){ //scrolling up, so e.g. 6 -> 5      
+      lastReload = null;
+    }
+    else if (entrySelected%entryListDisplayMax == 0 && entrySelected != lastReload){
+      lastReload = null; //reset lastReload value, that's our cue that we need to pull from SD card.
     }
   }
 
@@ -361,6 +402,8 @@ function handleKnob2(dir){
     screenSelected += dir;
   }
   entrySelected = 0; //reset to top of list
+  currentPerk = null;
+  lastReload = null;
   if (screenSelected > maxScreen){
     screenSelected = 0;
   } else if (screenSelected < 0){
@@ -387,21 +430,10 @@ function powerHandler(){
 
 function gracefulClose(){
   //shut down interval triggers first in case one fires while we're tearing down
-  clearInterval(modeCheck);
   clearInterval(intervalId);
   Pip.removeListener("knob1",registeredKnob1Func);
   Pip.removeListener("knob2",handleKnob2); 
   Pip.removeListener("torch",handleTorch); 
-  //now clear used memory.
-  /*delete loadedListMax;
-  delete entrySelected;
-  delete screenSelected;
-  delete pointsOfSelected;
-  delete drawing;
-  delete configMode;
-  delete allPerks;
-  delete enabledPerks;
-  delete registeredKnob1Func;*/
   showMainMenu(); //this causes a brief flicker but if we don't do it the controls stop working.
 }
 
@@ -415,6 +447,9 @@ let drawing=false;
 let configMode = false;
 let allPerks = [];
 let enabledPerks = [];
+let displayedPerks = []; //contains title and filename.
+let currentPerk = null; //contains all data
+let lastReload = null;
 let registeredKnob1Func = handleKnob1;
 
 Pip.on("knob1",registeredKnob1Func);
@@ -422,11 +457,11 @@ Pip.on("knob2",handleKnob2);
 Pip.on("torch",handleTorch);
 setWatch(powerHandler,BTN_POWER,{repeat:false});
 draw();
-let modeCheck = setInterval(ourModeHandler,100);
 let intervalId = setInterval(() => {  
+  checkMode();
   if (Pip.mode == 2){
     draw(); 
   } else {
     gracefulClose();
   }
-}, 1000);
+}, 16);
