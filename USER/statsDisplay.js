@@ -417,13 +417,6 @@ function handleTorch(){
   torchButtonHandler();
 }
 
-function ourModeHandler(){
-  checkMode();
-  if (Pip.mode != 2){
-    gracefulClose();
-  }
-}
-
 function powerHandler(){
   gracefulClose();
 }
