@@ -28,3 +28,4 @@ if (theme != null){
         pal[3][i]=g.toColor(theme[0] * i/16- (i*.4)/16,theme[1] * i/16- (i*.4)/16,theme[2] * i/16- (i*.4)/16);
     Pip.setPalette(pal);
 }
+delete theme;
