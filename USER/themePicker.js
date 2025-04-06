@@ -16,7 +16,6 @@ function readThemeFile(){
     }
     try{
         let fileString = require("fs").readFileSync(themeSettingsFile);
-        log("read " + fileString + "from " + themeSettingsFile);
         let fileObj = JSON.parse(fileString);
         theme = fileObj;
     } catch{
@@ -33,35 +32,41 @@ function writeThemeFile(){
     }
     let jsonString = JSON.stringify(theme);
     require("fs").writeFile(themeSettingsFile, jsonString);
-    log("wrote " + jsonString + "to " + themeSettingsFile);
+}
+
+function resetTheme(){
+    try{
+        require("fs").unlink(themeSettingsFile);
+    } catch{}
 }
 
 function draw(){
     g.clear(); 
-    g.setFontMonofonto23();
+    g.setFontMonofonto18();
     g.setColor(theme[0], theme[1], theme[2]);
-    g.drawString('Select the primary color of\nthe theme', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 80);
+    g.drawString('Select the primary color of\nthe theme', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 110);
     switch(selected){
         case 0:
-            g.drawString("R*:" + theme[0] + "G:" + theme[1] + "B:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 20);
+            g.drawString("R*:" + theme[0] + "G:" + theme[1] + "B:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
             break;
         case 1:
-            g.drawString("R:" + theme[0] + "G*:" + theme[1] + "B:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 20);
+            g.drawString("R:" + theme[0] + "G*:" + theme[1] + "B:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
             break;
         case 2:
-            g.drawString("R:" + theme[0] + "G:" + theme[1] + "B*:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 20);
+            g.drawString("R:" + theme[0] + "G:" + theme[1] + "B*:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
             break;
         default: break;
     }    
-    g.drawString('Press wheel in to save\nand reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100);
+    g.drawString('Press wheel in to save\nand reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 70);
+    g.drawString('Press torch to reset theme\nand reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 110);
 
-    g.fillRect(SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 + 60);
+    g.fillRect(SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT / 2 -20 , SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 + 30);
     g.setColor(theme[0] - .1, theme[1]- .1, theme[2]- .1);
-    g.fillRect(SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60);
+    g.fillRect(SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 -20, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30);
     g.setColor(theme[0] - .2, theme[1]- .2, theme[2]- .2);
-    g.fillRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 + 60, SCREEN_HEIGHT / 2 + 60);
+    g.fillRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 -20, SCREEN_WIDTH / 2 + 60, SCREEN_HEIGHT / 2 + 30);
     g.setColor(theme[0] - .3, theme[1]- .3, theme[2]- .3);
-    g.fillRect(SCREEN_WIDTH / 2 + 60, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 + 120, SCREEN_HEIGHT / 2 + 60);
+    g.fillRect(SCREEN_WIDTH / 2 + 60, SCREEN_HEIGHT / 2 -20, SCREEN_WIDTH / 2 + 120, SCREEN_HEIGHT / 2 + 30);
 }
 
 function gracefulClose(){
@@ -69,6 +74,7 @@ function gracefulClose(){
     clearInterval(intervalId);
     Pip.removeListener("knob1",handleKnob1);
     Pip.removeListener("knob2",handleKnob2); 
+    Pip.removeListener("torch",handleTorch); 
     E.reboot(); //we're using too much memory, we gotta full reboot now.
 }
 
@@ -104,8 +110,14 @@ function handleKnob2(dir){
     draw();
 }
 
+function handleTorch(){
+    resetTheme();
+    gracefulClose();
+}
+
 Pip.on("knob1",handleKnob1);
 Pip.on("knob2",handleKnob2);
+Pip.on("torch",handleTorch);
 
 readThemeFile();
 draw();
