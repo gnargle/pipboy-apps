@@ -29,3 +29,4 @@ if (theme != null){
     Pip.setPalette(pal);
 }
 delete theme;
+delete readThemeFile;
