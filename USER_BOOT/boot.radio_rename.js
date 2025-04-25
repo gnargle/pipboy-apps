@@ -1,0 +1,1 @@
+eval(submenuRadio.toString().replace("\"KPSS Radio\"", "\"Radio New Vegas\"").replace(/^function/, "function submenuRadio"))
