@@ -389,7 +389,6 @@ function handleKnob1(dir){
     } else if (entrySelected >= loadedListMax){
       entrySelected = 0;
     }
-    log("dir:" + dir + " lastReload:" + lastReload + " entrySelected:" + entrySelected + " loadedListMax:" + loadedListMax)
     if (dir > 0 && lastReload - 1 == entrySelected){ //scrolling up, so e.g. 6 -> 5      
       lastReload = null;
     }
