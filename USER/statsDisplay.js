@@ -14,10 +14,10 @@ const perkScreen = 2;
 const statScreen = 1;
 const SPECIALScreen=0;
 const perkSelectionScreen = 3;
-const enabledPerkFolder = 'USER/StatsDisplay/PERKS/ENABLED/';
-const allPerkFolder = 'USER/StatsDisplay/PERKS/ALL/';
-const skillsFolder = 'USER/StatsDisplay/SKILLS/';
-const specialFolder = 'USER/StatsDisplay/SPECIAL/';
+const enabledPerkFolder = 'USER/StatsDisplay/PERKS/ENABLED';
+const allPerkFolder = 'USER/StatsDisplay/PERKS/ALL';
+const skillsFolder = 'USER/StatsDisplay/SKILLS';
+const specialFolder = 'USER/StatsDisplay/SPECIAL';
 
 Graphics.prototype.setFontMonofonto14 = function() {
   // Actual height 14 (13 - 0)
@@ -28,6 +28,15 @@ Graphics.prototype.setFontMonofonto14 = function() {
     atob("BwYHCAgICAYHBggIBgcGCAgGCAgICAgICAgGBggICAgICAgICAcICAgICAgICAgICAgICAgICAgICAgICAUICAcICAgICAgICAcHCAYICAgICAgICAgICAgICAgGBwg="),
     14|65536
   );
+}
+
+function pathCombine(string1, string2){
+  let result = string1;
+  if (!string1.endsWith("/")){
+    result = result + "/";
+  }
+  result = result + string2;
+  return result;
 }
 
 //SECTION: Screen drawing
@@ -77,7 +86,7 @@ function buildScreen(directory){
     }
     for(i = a * entryListDisplayMax; i < entryListMax; i++){
       let file = files[i];
-      let fileString = require("fs").readFileSync(directory + file);
+      let fileString = require("fs").readFileSync(pathCombine(directory,file));
       let fileObj = JSON.parse(fileString);
       if (screenSelected != perkScreen){
         displayedPerks.push({
@@ -99,7 +108,7 @@ function buildScreen(directory){
   if (currentPerk == null){
     let currPerkInt = entrySelected%6;
     let file = displayedPerks[currPerkInt].filename;
-    let fileString = require("fs").readFileSync(directory + file);
+    let fileString = require("fs").readFileSync(pathCombine(directory,file));
     let fileObj = JSON.parse(fileString);
     currentPerk = fileObj;
   }
@@ -163,7 +172,7 @@ function generatePerksConfigLists(){
   files = require("fs").readdirSync(allPerkFolder);
   loadedListMax = files.length;
   for (file of files){
-    let fileString = require("fs").readFileSync(allPerkFolder + file);
+    let fileString = require("fs").readFileSync(pathCombine(allPerkFolder,file));
     let fileObj = JSON.parse(fileString);
     let perkObj = {filename: file, title: fileObj.title};
     allPerks.push(perkObj);
@@ -270,7 +279,7 @@ function drawSelectedEntryOutlineConfig(i, col){
 //SECTION: config saving
 function saveFile(directory){
   let files = require("fs").readdirSync(directory);  
-  let fileToSave = directory + files[entrySelected];
+  let fileToSave = pathCombine(directory,files[entrySelected]);
   let fileString = require("fs").readFileSync(fileToSave);
   let fileObj = JSON.parse(fileString);
   fileObj.points = pointsOfSelected;
@@ -291,8 +300,9 @@ function saveNewValue(){
 
 function saveEnabledPerk(filename){
   //"USER/PERKS/ALL"
-  let fileString = require("fs").readFileSync(allPerkFolder + filename);
-  require("fs").writeFile(enabledPerkFolder + filename, fileString);
+  
+  let fileString = require("fs").readFileSync(pathCombine(allPerkFolder,filename));
+  require("fs").writeFile(pathCombine(enabledPerkFolder,filename), fileString);
 }
 
 function saveNewPerkSelection(){
@@ -306,7 +316,7 @@ function saveNewPerkSelection(){
       saveEnabledPerk(perk.filename)
     } else if (!enabledPerks.includes(perk.filename) && enabledFiles.includes(perk.filename)){
       //was enabled, no longer is, delete the file from ENABLED
-      require("fs").unlink(enabledPerkFolder + perk.filename);
+      require("fs").unlink(pathCombine(enabledPerkFolder,perk.filename));
     }
   }
   //everything done, wipe out the in-memory enabled/disabled lists.
@@ -373,9 +383,13 @@ function handleKnob1(dir){
     currentPerk = null;
     if (entrySelected < 0){
       entrySelected = loadedListMax - 1;
+      if (loadedListMax > entryListDisplayMax){
+        lastReload = null; //always reload page if wrapping.
+      }
     } else if (entrySelected >= loadedListMax){
       entrySelected = 0;
     }
+    log("dir:" + dir + " lastReload:" + lastReload + " entrySelected:" + entrySelected + " loadedListMax:" + loadedListMax)
     if (dir > 0 && lastReload - 1 == entrySelected){ //scrolling up, so e.g. 6 -> 5      
       lastReload = null;
     }
