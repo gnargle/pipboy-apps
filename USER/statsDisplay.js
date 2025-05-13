@@ -97,10 +97,10 @@ function buildScreen(directory) {
     //time to populate the displayedPerks array and currentPerk
     var files;
     try {
-      files = require('fs').readdirSync(normalizeDir(directory));
+      files = fs.readdirSync(normalizeDir(directory));
     } catch {
-      require('fs').mkdir(normalizeDir(directory));
-      files = require('fs').readdirSync(normalizeDir(directory));
+      fs.mkdir(normalizeDir(directory));
+      files = fs.readdirSync(normalizeDir(directory));
     }
 
     files = files.filter((f) => f !== '.' && f !== '..');
@@ -108,7 +108,7 @@ function buildScreen(directory) {
     if (isModernVersion) {
       files = files.filter((file) => {
         try {
-          let stat = require('fs').statSync(
+          let stat = fs.statSync(
             normalizeDir(directory) + '/' + file,
           );
           return !stat.isDirectory;
@@ -139,7 +139,7 @@ function buildScreen(directory) {
       const fullPath = normalizeDir(directory) + '/' + file;
       let fileString;
       try {
-        fileString = require('fs').readFileSync(fullPath);
+        fileString = fs.readFileSync(fullPath);
       } catch (e) {
         console.log('Skipping unreadable file:', fullPath, e);
         continue;
@@ -173,7 +173,7 @@ function buildScreen(directory) {
     let file = displayedPerks[currPerkInt].filename;
     const fullPath = normalizeDir(directory) + '/' + file;
     try {
-      let fileString = require('fs').readFileSync(fullPath);
+      let fileString = fs.readFileSync(fullPath);
       currentPerk = JSON.parse(fileString);
     } catch (e) {
       console.log('Error loading currentPerk file:', fullPath, e);
@@ -234,10 +234,10 @@ function generatePerksConfigLists() {
   //first load of screen, build the full list.
   var files;
   try {
-    files = require('fs').readdirSync(normalizeDir(enabledPerkFolder));
+    files = fs.readdirSync(normalizeDir(enabledPerkFolder));
   } catch {
-    require('fs').mkdir(enabledPerkFolder);
-    files = require('fs').readdirSync(normalizeDir(enabledPerkFolder));
+    fs.mkdir(enabledPerkFolder);
+    files = fs.readdirSync(normalizeDir(enabledPerkFolder));
   }
 
   files = files.filter((f) => f !== '.' && f !== '..');
@@ -247,7 +247,7 @@ function generatePerksConfigLists() {
   }
 
   try {
-    files = require('fs').readdirSync(normalizeDir(allPerkFolder));
+    files = fs.readdirSync(normalizeDir(allPerkFolder));
     files = files.filter((f) => f !== '.' && f !== '..');
   } catch {
     console.log('ERROR: Missing ALL perk folder!');
@@ -259,7 +259,7 @@ function generatePerksConfigLists() {
     let fullPath = normalizeDir(allPerkFolder) + '/' + file;
     let fileString;
     try {
-      fileString = require('fs').readFileSync(fullPath);
+      fileString = fs.readFileSync(fullPath);
     } catch (e) {
       console.log('Skipping missing perk file:', fullPath, e);
       continue;
@@ -411,7 +411,7 @@ function saveFile(directory) {
 
   let fileString;
   try {
-    fileString = require('fs').readFileSync(fileToSave);
+    fileString = fs.readFileSync(fileToSave);
   } catch (e) {
     console.log('Error reading file to save:', fileToSave, e);
     return;
@@ -429,7 +429,7 @@ function saveFile(directory) {
   fileString = JSON.stringify(fileObj);
 
   try {
-    require('fs').writeFile(fileToSave, fileString);
+    fs.writeFile(fileToSave, fileString);
   } catch (e) {
     console.log('Error writing file:', fileToSave, e);
   }
@@ -449,10 +449,10 @@ function saveNewValue() {
 
 function saveEnabledPerk(filename) {
   //"USER/PERKS/ALL"
-  let fileString = require('fs').readFileSync(
+  let fileString = fs.readFileSync(
     normalizeDir(allPerkFolder) + '/' + filename,
   );
-  require('fs').writeFile(
+  fs.writeFile(
     normalizeDir(enabledPerkFolder) + '/' + filename,
     fileString,
   );
@@ -461,10 +461,10 @@ function saveEnabledPerk(filename) {
 function saveNewPerkSelection() {
   let enabledFiles;
   try {
-    enabledFiles = require('fs').readdirSync(normalizeDir(enabledPerkFolder));
+    enabledFiles = fs.readdirSync(normalizeDir(enabledPerkFolder));
   } catch (e) {
     console.log('Enabled folder missing, creating...');
-    require('fs').mkdir(normalizeDir(enabledPerkFolder));
+    fs.mkdir(normalizeDir(enabledPerkFolder));
     enabledFiles = [];
   }
 
@@ -488,7 +488,7 @@ function saveNewPerkSelection() {
       enabledFiles.includes(perk.filename)
     ) {
       //was enabled, no longer is, delete the file from ENABLED
-      require('fs').unlink(
+      fs.unlink(
         normalizeDir(enabledPerkFolder) + '/' + perk.filename,
       );
     }
