@@ -172,7 +172,7 @@ function bS(d) {
       dE(cp);
       dSEO(i);
       if (!cm && scs != ps) {
-        p = po.p;
+        pos = po.p;
       }
     }
     dET(po.t, i, po.en == es);
@@ -331,6 +331,7 @@ function dETC(t, i, s, c, e) {
 }
 
 function dEP(p, i, s) {
+  //drawEntryPoints(points, i, selected)
   bC.setFontMonofonto18();
   if (s) {
     bC.setColor(cb);
@@ -354,7 +355,7 @@ function dEP(p, i, s) {
       146,
       toy * i + 17,
     ]);
-    bC.drawString(p, 160, toy * i + 5);
+    bC.drawString(pos, 160, toy * i + 5);
   } else {
     bC.drawString(p, 160, toy * i + 5);
   }
@@ -411,7 +412,7 @@ function sF(d) {
     return;
   }
 
-  fo.p = p;
+  fo.p = pos;
   fis = JSON.stringify(fo);
 
   try {
@@ -421,7 +422,7 @@ function sF(d) {
   }
 
   // update in-memory data
-  dp[es % eldm].p = p;
+  dp[es % eldm].p = pos;
   cp = fo;
 }
 
@@ -509,10 +510,10 @@ function hK1C(d) {
     Pip.on('knob1', hK1);
     rk1f = hK1;
   } else {
-    p += d;
-    if (p < 0) {
-      p = 100;
-    } else if (p > 100) {
+    pos += d;
+    if (pos < 0) {
+      pos = 100;
+    } else if (pos > 100) {
       es = 0;
     }
   }
@@ -664,7 +665,7 @@ function gC() {
 let llm = 0;
 let es = 0;
 let scs = 0;
-let p = 0;
+let pos = 0;
 let dr = false;
 let cm = false;
 let ap = [];
