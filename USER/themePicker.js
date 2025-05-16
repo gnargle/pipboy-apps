@@ -1,5 +1,7 @@
-let theme = [1,1,1];
+let theme0 = [1,1,1];
+let theme1 = [1,1,1];
 let selected = 0;
+let gradient = false;
 
 const SCREEN_WIDTH = g.getWidth();
 const SCREEN_HEIGHT = g.getHeight();
@@ -17,7 +19,9 @@ function readThemeFile(){
     try{
         let fileString = require("fs").readFileSync(themeSettingsFile);
         let fileObj = JSON.parse(fileString);
-        theme = fileObj;
+        theme0 = fileObj.theme0;
+        theme1 = fileObj.theme1;
+        gradient = fileObj.gradient;
     } catch{
         //folder created but no theme file yet, ignore
         return;
@@ -30,7 +34,12 @@ function writeThemeFile(){
     } catch{
         require("fs").mkdir(themeSettingsFolder); 
     }
-    let jsonString = JSON.stringify(theme);
+    let jobj = {
+        gradient: gradient,
+        theme0: theme0,
+        theme1: theme1,
+    }
+    let jsonString = JSON.stringify(jobj);
     require("fs").writeFile(themeSettingsFile, jsonString);
 }
 
@@ -40,33 +49,84 @@ function resetTheme(){
     } catch{}
 }
 
+function drawBlocks(){
+    let offset = -120;
+    
+    if (gradient){
+        for(i = 0; i < 16; i++){
+            let frac = 0;        
+            g.setColor(((theme1[0] - theme0[0]) * frac + theme0[0]) * i/16, ((theme1[1] - theme0[1]) * frac + theme0[1]) * i/16, ((theme1[2] - theme0[2]) * frac + theme0[2]) * i/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 -20 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 -4);
+            frac = 0.33;            
+            g.setColor(((theme1[0] - theme0[0]) * frac + theme0[0]) * i/16 - (i*.2)/16, ((theme1[1] - theme0[1]) * frac + theme0[1]) * i/16 - (i*.2)/16, ((theme1[2] - theme0[2]) * frac + theme0[2]) * i/16 - (i*.2)/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 + -4 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 +12);
+            frac = 1;
+            g.setColor(((theme1[0] - theme0[0]) * frac + theme0[0]) * i/16 + (i*.2)/16, ((theme1[1] - theme0[1]) * frac + theme0[1]) * i/16 + (i*.2)/16, ((theme1[2] - theme0[2]) * frac + theme0[2]) * i/16 + (i*.2)/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 + 12 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 +28);
+            frac = 0.66;
+            g.setColor(((theme1[0] - theme0[0]) * frac + theme0[0]) * i/16- (i*.4)/16, ((theme1[1] - theme0[1]) * frac + theme0[1]) * i/16- (i*.4)/16, ((theme1[2] - theme0[2]) * frac + theme0[2]) * i/16- (i*.4)/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 + 28 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 +44);
+            offset += 16;
+        }
+    } else {
+        for(i = 0; i < 16; i++){
+            g.setColor(theme0[0] * i/16, theme0[1] * i/16, theme0[2] * i/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 -20 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 -4);
+            g.setColor(theme0[0] * i/16 - (i*.2)/16, theme0[1] * i/16- (i*.2)/16, theme0[2] * i/16- (i*.2)/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 + -4 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 +12);
+            g.setColor(theme0[0] * i/16 + (i*.2)/16, theme0[1] * i/16 + (i*.2)/16, theme0[2] * i/16 + (i*.2)/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 + 12 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 +28);
+            g.setColor(theme0[0] * i/16- (i*.4)/16, theme0[1] * i/16- (i*.4)/16, theme0[2] * i/16- (i*.4)/16);
+            g.fillRect(SCREEN_WIDTH / 2 - offset, SCREEN_HEIGHT / 2 + 28 , SCREEN_WIDTH / 2 - offset + 16, SCREEN_HEIGHT / 2 +44);
+            offset += 16;
+        }
+    }
+}
+
 function draw(){
     g.clear(); 
     g.setFontMonofonto18();
-    g.setColor(theme[0], theme[1], theme[2]);
-    g.drawString('Select the primary color of\nthe theme', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 110);
-    switch(selected){
+    g.setColor(theme0[0], theme0[1], theme0[2]);
+    g.drawString('Select the primary color of the theme', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 110);
+    g.drawString('Move the tuner up to toggle 1 or 2 colours.' , SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 90)
+    if (gradient){
+        switch(selected){
         case 0:
-            g.drawString("R*:" + theme[0] + "G:" + theme[1] + "B:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            g.drawString("1: R*:" + theme0[0] + "G:" + theme0[1] + "B:" + theme0[2] + "   2: R:" + theme1[0] + "G:" + theme1[1] + "B:" + theme1[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
             break;
         case 1:
-            g.drawString("R:" + theme[0] + "G*:" + theme[1] + "B:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            g.drawString("1: R:" + theme0[0] + "G*:" + theme0[1] + "B:" + theme0[2]  + "   2: R:" + theme1[0] + "G:" + theme1[1] + "B:" + theme1[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
             break;
         case 2:
-            g.drawString("R:" + theme[0] + "G:" + theme[1] + "B*:" + theme[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            g.drawString("1: R:" + theme0[0] + "G:" + theme0[1] + "B*:" + theme0[2]  + "   2: R:" + theme1[0] + "G:" + theme1[1] + "B:" + theme1[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            break;
+        case 3:
+            g.drawString("1: R:" + theme0[0] + "G:" + theme0[1] + "B:" + theme0[2] + "   2: R*:" + theme1[0] + "G:" + theme1[1] + "B:" + theme1[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            break;
+        case 4:
+            g.drawString("1: R:" + theme0[0] + "G:" + theme0[1] + "B:" + theme0[2]  + "   2: R:" + theme1[0] + "G*:" + theme1[1] + "B:" + theme1[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            break;
+        case 5:
+            g.drawString("1: R:" + theme0[0] + "G:" + theme0[1] + "B:" + theme0[2]  + "   2: R:" + theme1[0] + "G:" + theme1[1] + "B*:" + theme1[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
             break;
         default: break;
+        }  
+    } else {
+        switch(selected){
+        case 0:
+            g.drawString("R*:" + theme0[0] + "G:" + theme0[1] + "B:" + theme0[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            break;
+        case 1:
+            g.drawString("R:" + theme0[0] + "G*:" + theme0[1] + "B:" + theme0[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            break;
+        case 2:
+            g.drawString("R:" + theme0[0] + "G:" + theme0[1] + "B*:" + theme0[2], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+            break;
+        default: break;
+        }    
     }    
-    g.drawString('Press wheel in to save\nand reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 70);
-    g.drawString('Press torch to reset theme\nand reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 110);
-
-    g.fillRect(SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT / 2 -20 , SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 + 30);
-    g.setColor(theme[0] - .1, theme[1]- .1, theme[2]- .1);
-    g.fillRect(SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 -20, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30);
-    g.setColor(theme[0] - .2, theme[1]- .2, theme[2]- .2);
-    g.fillRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 -20, SCREEN_WIDTH / 2 + 60, SCREEN_HEIGHT / 2 + 30);
-    g.setColor(theme[0] - .3, theme[1]- .3, theme[2]- .3);
-    g.fillRect(SCREEN_WIDTH / 2 + 60, SCREEN_HEIGHT / 2 -20, SCREEN_WIDTH / 2 + 120, SCREEN_HEIGHT / 2 + 30);
+    g.drawString('Press wheel in to save and reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 90);
+    g.drawString('Press torch to reset theme and reboot', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 110);
 }
 
 function gracefulClose(){
@@ -83,15 +143,29 @@ function handleKnob1(dir){
     Pip.knob1Click(dir);
 
     if (dir == 0){
+        gradient != gradient;
         writeThemeFile();
         gracefulClose();
     }
     else {
-        theme[selected] += dir*.01;
-        if (theme[selected] < 0){
-            theme[selected] = 0;
-        } else if (theme[selected] > 1){
-            theme[selected] = 1;
+        if (gradient && selected > 2){
+            theme1[selected%3] += dir*.01;
+            if (theme1[selected%3] < 0){
+                theme1[selected%3] = 0;
+                return; //skip draw at cap.
+            } else if (theme1[selected%3] > 1){
+                theme1[selected%3] = 1;
+                return; //skip draw at cap.
+            }
+        } else {
+            theme0[selected] += dir*.01;
+            if (theme0[selected] < 0){
+                theme0[selected] = 0;
+                return; //skip draw at cap.
+            } else if (theme0[selected] > 1){
+                theme0[selected] = 1;
+                return; //skip draw at cap.
+            }
         }
     }
     draw();
@@ -104,8 +178,13 @@ function handleKnob2(dir){
     selected += dir;
     if (selected < 0){
         selected = 0;
-    } else if (selected > 2){
+        return; //skip draw at cap.
+    } else if (!gradient && selected > 2){
         selected = 2;
+        return; //skip draw at cap.
+    } else if (gradient && selected > 5){
+        selected = 5;
+        return; //skip draw at cap.
     }
     draw();
 }
@@ -113,6 +192,13 @@ function handleKnob2(dir){
 function handleTorch(){
     resetTheme();
     gracefulClose();
+}
+
+function checkTuner(){
+    if (BTN_TUNEUP.read()) {
+        gradient = !gradient;
+        draw();
+    }
 }
 
 Pip.on("knob1",handleKnob1);
@@ -125,5 +211,9 @@ let intervalId = setInterval(() => {
   checkMode();
   if (Pip.mode != 2){
     gracefulClose();
+  } else {
+    //only load the blocks every yeigh-often to prevent slow draws.
+    drawBlocks();
+    checkTuner();
   }
-}, 100);
+}, 250);
