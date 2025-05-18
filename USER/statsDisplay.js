@@ -70,9 +70,9 @@ function draw() {
   } else if (scs == pss) {
     bPSS();
   }
-  bH.flip();
+  /*bH.flip();
   bF.flip();
-  bC.flip();
+  bC.flip();*/
   dr = false;
 }
 
@@ -517,6 +517,7 @@ function hK1C(d) {
       es = 0;
     }
   }
+  draw();
 }
 
 function hK1(d) {
@@ -561,6 +562,7 @@ function hK1(d) {
       lr = null; //reset lastReload value, that's our cue that we need to pull from SD card.
     }
   }
+  draw();
 }
 
 function hK2(d) {
@@ -584,6 +586,7 @@ function hK2(d) {
   } else if (scs < 0) {
     scs = ms;
   }
+  draw();
 }
 
 function hT() {
@@ -694,13 +697,18 @@ Pip.on('torch', hT);
 
 setWatch(pH, BTN_POWER, { repeat: false });
 
+draw(); //do initial draw to setup buffers.
+
 let intervalId = setInterval(() => {
   checkMode();
   if (Pip.mode == 2) {
-    draw();
+    //draw();
+    bH.flip();
+    bF.flip();
+    bC.flip();
   } else {
     gC();
-    delete gC;
-    showMainMenu();
+    /*delete gC;
+    showMainMenu();*/
   }
 }, 16);
