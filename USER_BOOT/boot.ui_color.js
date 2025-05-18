@@ -85,7 +85,7 @@ try{
             Pip.setPalette(pal);
         }
     }
-    delete theme;
+    delete themeObj;
     delete pal;
     delete imv;
     delete readThemeFile;
