@@ -1,0 +1,10 @@
+[
+  {
+    "game": "piptris",
+    "scores": [1000, 100, 10, 1]
+  },
+  {
+    "game": "pip-pong",
+    "scores": [20, 15, 10, 5]
+  }
+]
