@@ -8,32 +8,25 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\gnarg\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/home/athene/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\Pip-Boy description splitter\\desc-splitter.csproj",
+      "projectUniqueName": "/home/athene/Documents/GitHub/pipboy-apps/desc-splitter/Pip-Boy description splitter/desc-splitter.csproj",
       "projectName": "desc-splitter",
-      "projectPath": "C:\\Users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\Pip-Boy description splitter\\desc-splitter.csproj",
-      "packagesPath": "C:\\Users\\gnarg\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\gnarg\\source\\repos\\gnargle\\pipboy-apps\\desc-splitter\\Pip-Boy description splitter\\obj\\",
+      "projectPath": "/home/athene/Documents/GitHub/pipboy-apps/desc-splitter/Pip-Boy description splitter/desc-splitter.csproj",
+      "packagesPath": "/home/athene/.nuget/packages/",
+      "outputPath": "/home/athene/Documents/GitHub/pipboy-apps/desc-splitter/Pip-Boy description splitter/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\gnarg\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/athene/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
+        "/usr/lib64/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -52,7 +45,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -68,12 +61,18 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[8.0.20, 8.0.20]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/9.0.110/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
